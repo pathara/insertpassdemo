@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>AsiaPay Lucky Draw — Kiosk</title>
+<style>
+:root{--navy:#00105d;--navy2:#10166d;--purple:#5421a7;--red:#e5232e;--orange:#f9a602;--white:#fff;--ink:#172033}
+*{box-sizing:border-box;-webkit-user-select:none;user-select:none}html,body{caret-color:transparent;margin:0;width:100%;min-height:100%;font-family:Arial,Helvetica,sans-serif;background:#020a3f;color:var(--ink);caret-color:transparent}body{overflow-x:hidden;user-select:none;-webkit-user-select:none}
+.kiosk{width:100%;max-width:1080px;min-height:100vh;margin:0 auto;background:linear-gradient(160deg,#f7fbff 0%,#eef3ff 48%,#fff 100%);position:relative;overflow:hidden}
+.top{height:92px;padding:25px 42px;display:flex;align-items:center;justify-content:space-between;background:#fff;box-shadow:0 3px 18px rgba(0,0,0,.08);position:relative;z-index:10}.brand{font-size:28px;font-weight:1000;color:var(--navy)}.top-actions{display:flex;gap:12px;align-items:center}.dash,.lang{border:0;border-radius:12px;padding:12px 18px;font-weight:900;background:#edf1f7;color:var(--navy);text-decoration:none}.lang{cursor:pointer}.floatdash{position:fixed;right:22px;bottom:22px;z-index:40;display:flex;flex-direction:column;gap:10px}.floatdash a{border:0;border-radius:12px;padding:12px 16px;font-weight:900;background:#edf1f7;color:var(--navy);text-decoration:none;box-shadow:0 8px 24px #0002;font-size:14px}
+.page{display:none;min-height:calc(100vh - 92px);padding:58px 58px 80px;position:relative}.page.active{display:flex}.center{align-items:center;justify-content:center;flex-direction:column;text-align:center}.eyebrow{font-size:22px;color:#68728a;font-weight:900;letter-spacing:.08em;text-transform:uppercase}.title{font-size:clamp(64px,9vw,105px);line-height:.95;font-weight:1000;color:var(--navy);margin:22px 0 25px}.sub{font-size:26px;color:#566176;max-width:780px;line-height:1.45;margin:0 0 40px}.btn{border:0;border-radius:18px;padding:20px 48px;font-size:28px;font-weight:1000;cursor:pointer}.primary{background:var(--orange);color:var(--navy);box-shadow:0 12px 30px rgba(249,166,2,.28)}
+.draw-stage{width:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1}.wheel-wrap{position:relative;width:min(760px,82vw);aspect-ratio:1/1;margin:5px auto 30px}.wheel{position:absolute;inset:0;border-radius:50%;border:16px solid #fff;box-shadow:0 18px 60px rgba(0,14,90,.35),0 0 0 10px rgba(0,16,93,.08);overflow:hidden;transition:transform 7.5s cubic-bezier(.055,.66,.12,1);background:#ddd}.wheel::after{content:"";position:absolute;inset:45%;border-radius:50%;background:#fff;border:10px solid var(--orange);box-shadow:0 6px 18px rgba(0,0,0,.35);z-index:25;pointer-events:none}.wheel.spinning .wheel-item{animation:counterSpin 8.5s cubic-bezier(.07,.74,.13,1) forwards}.wheel-item{position:absolute;width:160px;height:160px;text-align:center;z-index:10;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;text-shadow:0 3px 7px rgba(0,0,0,.75);pointer-events:none}.wheel-item img{width:105px;height:105px;object-fit:contain;border-radius:50%;border:4px solid #fff;box-shadow:0 7px 20px rgba(0,0,0,.4);background:rgba(255,255,255,.92)}.wheel-item .wnum{font-size:18px;font-weight:1000;line-height:1;margin-top:6px}.wheel-item .wname{font-size:16px;font-weight:900;line-height:1.08;max-width:155px;margin-top:4px}.wheel-item.noimg img{display:none}.wheel-item.noimg{height:110px}.pointer{position:absolute;z-index:40;top:-4px;left:50%;transform:translateX(-50%);width:0;height:0;border-left:30px solid transparent;border-right:30px solid transparent;border-top:58px solid var(--red);filter:drop-shadow(0 5px 4px rgba(0,0,0,.35))}.spin-note{font-size:21px;color:#697386;margin-top:4px;font-weight:800}
+.result-wrap{width:min(760px,90vw);text-align:center}.result-head{font-size:27px;color:#68728a;font-weight:900;letter-spacing:.08em;text-transform:uppercase}.result-card{margin:25px auto;padding:20px 20px 35px;border-radius:30px;background:linear-gradient(145deg,#07145f,#4a1797);color:#fff;box-shadow:0 18px 45px rgba(0,0,0,.24)}.result-image{width:min(350px,62vw);height:min(350px,62vw);object-fit:contain;border-radius:24px;border:4px solid #fff;box-shadow:0 12px 28px rgba(0,0,0,.3);background:#fff}.result-image.hide{display:none}.result-number{font-size:46px;font-weight:1000;color:#ffe79b;margin-top:16px}.result-name{font-size:38px;font-weight:1000;margin-top:7px}.result-name.empty{display:none}.result-desc{font-size:21px;line-height:1.5;margin:18px auto 0;max-width:620px}.fireworks{position:fixed;inset:0;pointer-events:none;z-index:150;display:none;overflow:hidden}.fireworks.show{display:block}.particle{position:absolute;width:10px;height:10px;border-radius:50%;animation:burst var(--dur) ease-out forwards;left:var(--x);top:var(--y);background:var(--c);box-shadow:0 0 15px var(--c)}@keyframes counterSpin{from{transform:translate(-50%,-50%) rotate(0deg)}to{transform:translate(-50%,-50%) rotate(var(--counter-target,0deg))}}@keyframes burst{0%{transform:translate(0,0) scale(.2);opacity:1}70%{opacity:1}100%{transform:translate(var(--dx),var(--dy)) scale(.75);opacity:0}}
+ .winner-overlay{position:fixed;inset:0;background:radial-gradient(ellipse at center,rgba(31,47,150,.96) 0%,rgba(3,8,56,.97) 65%,rgba(0,0,25,.99) 100%);display:none;align-items:center;justify-content:center;z-index:100;padding:30px;backdrop-filter:blur(8px);overflow:hidden;isolation:isolate}.winner-overlay.show{display:flex}.winner-overlay::before{content:"";position:absolute;inset:-55%;z-index:-2;background:repeating-conic-gradient(from 0deg,rgba(255,230,130,.0) 0deg 8deg,rgba(255,226,120,.22) 8deg 11deg,rgba(255,255,255,.02) 11deg 18deg);animation:gachaRays 18s linear infinite}.winner-overlay::after{content:"";position:absolute;inset:0;z-index:-1;background:radial-gradient(circle at center,rgba(255,255,255,.24),transparent 52%);animation:gachaPulse 1.8s ease-in-out infinite alternate}.winner-card{width:min(700px,82vw);background:transparent;padding:25px;text-align:center;color:#fff;position:relative;animation:gachaPop .8s cubic-bezier(.16,1.35,.35,1) both}.winner-card::before{content:"";position:absolute;z-index:-1;left:50%;top:44%;width:min(520px,78vw);aspect-ratio:1;transform:translate(-50%,-50%);border-radius:50%;border:3px solid rgba(255,236,150,.9);box-shadow:0 0 24px #ffdf57,0 0 65px rgba(92,186,255,.85),inset 0 0 40px rgba(255,255,255,.45);animation:gachaRing 2.6s ease-out infinite}.winner-card img{width:min(390px,62vw);height:min(390px,62vw);object-fit:contain;border:0;box-shadow:0 0 35px rgba(255,255,255,.32);background:transparent;filter:drop-shadow(0 0 22px rgba(255,220,85,.8));animation:prizeFloat 2.4s ease-in-out infinite}.winner-card img.hide{display:none}.w-number{font-size:60px;font-weight:1000;color:#ffe79b;margin-top:15px;text-shadow:0 0 12px #ffb700,0 4px 2px rgba(0,0,0,.5)}.w-name{font-size:48px;font-weight:1000;margin-top:8px;text-shadow:0 3px 10px rgba(0,0,0,.65)}.w-name.empty{display:none}.winner-overlay.rarity-1 .winner-card::before{border-color:#fff4ae;box-shadow:0 0 32px #ffdf57,0 0 90px #ff8a00,inset 0 0 55px #fff}.winner-overlay.rarity-2 .winner-card::before{box-shadow:0 0 28px #69eaff,0 0 70px #526cff}.winner-overlay.rarity-3 .winner-card::before{box-shadow:0 0 25px #df8aff,0 0 60px #8c55ff}@keyframes gachaPop{0%{transform:scale(.25) rotate(-8deg);opacity:0;filter:brightness(2.5)}55%{transform:scale(1.12) rotate(2deg);opacity:1;filter:brightness(1.3)}75%{transform:scale(.96) rotate(-1deg)}100%{transform:scale(1) rotate(0);opacity:1;filter:brightness(1)}}@keyframes gachaRays{to{transform:rotate(360deg)}}@keyframes gachaPulse{from{opacity:.3}to{opacity:1}}@keyframes gachaRing{0%{transform:translate(-50%,-50%) scale(.72);opacity:.95}100%{transform:translate(-50%,-50%) scale(1.16);opacity:.15}}@keyframes prizeFloat{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-10px) scale(1.035)}}
+@media(min-height:1800px) and (min-width:900px){.kiosk{min-height:1920px}.page{min-height:1828px}.top{height:92px}.title{font-size:105px}.sub{font-size:28px}.btn{font-size:30px;padding:24px 60px}.wheel-wrap{width:760px}.spin-note{font-size:24px}.result-number{font-size:58px}.result-name{font-size:48px}}
+@media(max-width:680px){.top{height:70px;padding:16px 18px}.brand{font-size:21px}.dash{display:none}.page{min-height:calc(100vh - 70px);padding:30px 16px}.eyebrow{font-size:15px}.title{font-size:52px}.sub{font-size:18px}.btn{font-size:20px;padding:16px 30px}.wheel-wrap{width:min(500px,94vw)}.wheel{border-width:10px}.wheel-item{width:88px;height:88px}.wheel-item img{width:56px;height:56px;border-width:2px}.wheel-item .wnum{font-size:11px}.wheel-item .wname{font-size:9px;max-width:82px}.pointer{border-left-width:20px;border-right-width:20px;border-top-width:40px}.spin-note{font-size:14px}.result-image{width:min(260px,62vw);height:min(260px,62vw)}.result-number{font-size:38px}.result-name{font-size:30px}.winner-card img{width:min(280px,65vw);height:min(280px,65vw)}.w-number{font-size:42px}.w-name{font-size:32px}}
+
+/* Gacha-style prize reveal overlay inspired by the supplied reference video */
+.reveal-overlay{position:fixed;inset:0;z-index:1000;display:none;align-items:center;justify-content:center;padding:24px;background:rgba(5,8,35,.76);backdrop-filter:blur(5px);overflow:hidden}
+.reveal-overlay.show{display:flex}
+.reveal-rays{position:absolute;width:min(120vw,1100px);aspect-ratio:1;border-radius:50%;background:repeating-conic-gradient(from 0deg,rgba(255,220,93,.0) 0deg 7deg,rgba(255,222,105,.28) 7deg 10deg,rgba(255,255,255,.02) 10deg 15deg);mask-image:radial-gradient(circle,black 0 15%,rgba(0,0,0,.75) 40%,transparent 70%);animation:raysTurn 18s linear infinite;pointer-events:none}
+.reveal-rays:before{content:"";position:absolute;inset:12%;border-radius:50%;border:3px solid rgba(255,221,112,.7);box-shadow:0 0 25px #ffdc73, inset 0 0 25px rgba(255,222,105,.45);animation:ringPulse 1.1s ease-in-out infinite alternate}
+.reveal-card{position:relative;z-index:2;width:min(360px,84vw);min-height:280px;border-radius:28px;padding:30px 24px 25px;text-align:center;background:linear-gradient(160deg,#fff9e5 0%,#fff0c4 55%,#ffe3a1 100%);border:2px solid rgba(255,255,255,.95);box-shadow:0 0 0 5px rgba(255,202,65,.2),0 0 55px rgba(255,204,61,.8),0 25px 65px rgba(0,0,0,.45);animation:cardPop .62s cubic-bezier(.16,1.4,.35,1) both;transform-origin:center}
+.reveal-top-icon{position:absolute;top:-48px;left:50%;transform:translateX(-50%);width:94px;height:94px;display:flex;align-items:center;justify-content:center;font-size:68px;filter:drop-shadow(0 4px 5px rgba(125,75,0,.25));animation:iconFloat 1.6s ease-in-out infinite}
+.reveal-rank{margin-top:38px;font-size:clamp(25px,5vw,36px);font-weight:1000;color:#c84c16;text-shadow:0 1px white}
+.reveal-prize-img{display:block;object-fit:contain;width:150px;height:130px;margin:12px auto 8px;filter:drop-shadow(0 8px 9px rgba(93,69,22,.22));animation:prizeRise .8s .12s cubic-bezier(.2,1.4,.4,1) both}
+.reveal-name{font-size:clamp(19px,4vw,25px);font-weight:900;color:#26315a;line-height:1.25;overflow-wrap:anywhere}
+.reveal-shine{position:absolute;inset:0;border-radius:inherit;pointer-events:none;overflow:hidden}
+.reveal-shine:after{content:"";position:absolute;top:-30%;left:-60%;height:160%;width:35%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.85),transparent);transform:rotate(22deg);animation:shineSweep 1.25s .25s ease-out both}
+.reveal-particle{position:absolute;z-index:1;left:50%;top:50%;font-size:clamp(17px,3vw,32px);color:#ffe66b;text-shadow:0 0 10px #ffcb35,0 0 22px #ff9d20;pointer-events:none;animation:particleBurst 1.2s ease-out forwards}
+.reveal-overlay.tier-2 .reveal-rays:before{border-color:rgba(112,222,255,.8);box-shadow:0 0 25px #70deff,inset 0 0 25px rgba(112,222,255,.4)}
+.reveal-overlay.tier-3 .reveal-rays:before{border-color:rgba(202,137,255,.8);box-shadow:0 0 25px #ca89ff,inset 0 0 25px rgba(202,137,255,.4)}
+.reveal-overlay.tier-4 .reveal-rays,.reveal-overlay.tier-5 .reveal-rays{opacity:.45}
+.reveal-overlay.no-prize .reveal-rays{filter:hue-rotate(150deg);opacity:.25}
+@keyframes raysTurn{to{transform:rotate(360deg)}}
+@keyframes ringPulse{from{transform:scale(.96);opacity:.65}to{transform:scale(1.04);opacity:1}}
+@keyframes cardPop{0%{opacity:0;transform:translateY(45px) scale(.35) rotate(-5deg)}65%{opacity:1;transform:translateY(-7px) scale(1.06) rotate(1deg)}100%{transform:translateY(0) scale(1) rotate(0)}}
+@keyframes iconFloat{0%,100%{margin-top:0}50%{margin-top:-8px}}
+@keyframes prizeRise{from{opacity:0;transform:translateY(24px) scale(.65)}to{opacity:1;transform:translateY(0) scale(1)}}
+@keyframes shineSweep{0%{left:-60%}100%{left:130%}}
+@keyframes particleBurst{0%{opacity:0;transform:translate(-50%,-50%) scale(.2) rotate(0deg)}12%{opacity:1}100%{opacity:0;transform:translate(calc(-50% + var(--dx)),calc(-50% + var(--dy))) scale(.8) rotate(var(--rot))}}
+@media(prefers-reduced-motion:reduce){.reveal-rays,.reveal-rays:before,.reveal-card,.reveal-top-icon,.reveal-prize-img,.reveal-shine:after,.reveal-particle{animation-duration:.01ms!important;animation-iteration-count:1!important}}
+
+
+/* v7.8 Voice Pay palette: airy blue, white and cyan */
+:root{--navy:#0b438f;--navy2:#1456b8;--purple:#087bd9;--red:#087bd9;--orange:#16b8e8;--white:#fff;--ink:#173b68}
+html,body{background:#d9f2ff;color:#173b68}
+.kiosk{background:radial-gradient(ellipse at 50% 10%,#fff 0,#e8f8ff 38%,#b8e7ff 72%,#73c8f5 100%)}
+.top{background:rgba(255,255,255,.82);box-shadow:0 3px 18px rgba(0,94,170,.1);border-bottom:1px solid rgba(255,255,255,.8)}
+.brand,.title{color:#0b438f}
+.eyebrow,.sub,.spin-note,.result-head{color:#52769c}
+.btn.primary{background:linear-gradient(100deg,#0a55c5,#1cbde9);color:#fff;box-shadow:0 12px 30px rgba(0,118,210,.22)}
+.dash,.lang,.floatdash a{background:#fff;color:#0b4b9c;border:1px solid rgba(255,255,255,.9);box-shadow:0 8px 24px rgba(0,80,150,.12)}
+.wheel{border-color:#fff;box-shadow:0 18px 60px rgba(0,95,165,.2),0 0 0 10px rgba(0,135,215,.08)}
+.wheel::after{border-color:#16b8e8;box-shadow:0 6px 18px rgba(0,80,150,.18)}
+.wheel-item{text-shadow:0 2px 5px rgba(0,35,90,.65)}
+.pointer{border-top-color:#087bd9}
+.result-card{background:linear-gradient(145deg,rgba(255,255,255,.98),rgba(222,245,255,.96));color:#173b68;border:1px solid #fff;box-shadow:0 18px 45px rgba(0,90,160,.16)}
+.result-image{border-color:#fff;box-shadow:0 12px 28px rgba(0,90,160,.15)}
+.result-number{color:#087bd9;text-shadow:none}.result-name{color:#0b438f}.result-desc{color:#52769c}
+.fireworks .particle{box-shadow:0 0 15px var(--c)}
+.winner-overlay{background:radial-gradient(ellipse at center,rgba(245,252,255,.98) 0%,rgba(203,239,255,.97) 65%,rgba(95,190,246,.96) 100%)}
+.winner-overlay::before{background:repeating-conic-gradient(from 0deg,rgba(255,255,255,0) 0deg 8deg,rgba(60,174,242,.2) 8deg 11deg,rgba(255,255,255,.12) 11deg 18deg)}
+.winner-overlay::after{background:radial-gradient(circle at center,rgba(255,255,255,.8),transparent 52%)}
+.winner-card{color:#0b438f}.winner-card::before{border-color:rgba(255,255,255,.95);box-shadow:0 0 24px #fff,0 0 65px rgba(0,137,255,.6),inset 0 0 40px rgba(255,255,255,.8)}
+.winner-card img{filter:drop-shadow(0 0 22px rgba(0,125,220,.28));box-shadow:none}
+.w-number{color:#087bd9;text-shadow:0 0 12px rgba(70,190,255,.4)}.w-name{text-shadow:none;color:#0b438f}
+.winner-overlay.rarity-1 .winner-card::before{border-color:#fff;box-shadow:0 0 32px #fff,0 0 90px #42bfff,inset 0 0 55px #fff}
+.winner-overlay.rarity-2 .winner-card::before{box-shadow:0 0 28px #69eaff,0 0 70px #526cff}.winner-overlay.rarity-3 .winner-card::before{box-shadow:0 0 25px #8cdcff,0 0 60px #8c55ff}
+.reveal-overlay{background:rgba(202,237,255,.82)}
+.reveal-rays{background:repeating-conic-gradient(from 0deg,rgba(255,255,255,0) 0deg 7deg,rgba(65,181,245,.24) 7deg 10deg,rgba(255,255,255,.18) 10deg 15deg)}
+.reveal-rays:before{border-color:rgba(255,255,255,.9);box-shadow:0 0 25px #fff,inset 0 0 25px rgba(112,222,255,.45)}
+.reveal-card{background:linear-gradient(160deg,#fff 0%,#edfaff 55%,#cdeeff 100%);border-color:#fff;box-shadow:0 0 0 5px rgba(255,255,255,.35),0 0 55px rgba(0,151,230,.45),0 25px 65px rgba(0,60,120,.2)}
+.reveal-rank{color:#087bd9;text-shadow:none}.reveal-name{color:#0b438f}.reveal-prize-img{filter:drop-shadow(0 8px 9px rgba(0,100,170,.2))}
+.reveal-particle{color:#fff;text-shadow:0 0 10px #29c5ff,0 0 22px #087bd9}
+
+
+/* v7.9: remove the white result panel and the white frame/background around prize images */
+.result-card{background:transparent!important;border:0!important;box-shadow:none!important;border-radius:0!important;padding:20px 0 35px!important}
+.result-image{border:0!important;box-shadow:none!important;background:transparent!important;border-radius:0!important}
+
+</style>
+</head>
+<body>
+<div class="kiosk">
+<div class="top"><div class="brand"><img src="asset/paydollar-logo.png" alt="PayDollar" style="height:58px;width:92px;object-fit:contain;vertical-align:middle"></div><div class="top-actions"><button class="lang" id="langBtn">TC</button></div></div>
+<section class="page active center" id="intro"><div class="eyebrow">HK FinTech Week 2026</div><div class="title">LUCKY DRAW!</div><p class="sub">Try your luck and see what prize you win.</p><button class="btn primary" onclick="startDraw()">START!</button></section>
+<section class="page center" id="drawing"><div class="eyebrow">Good Luck!</div><div class="title" style="font-size:54px;margin-bottom:5px">Drawing...</div><div class="draw-stage"><div class="wheel-wrap"><div class="pointer"></div><div class="wheel" id="wheel"></div></div><div class="spin-note">Watch the wheel slow down and stop on your prize!</div></div></section>
+<section class="page center" id="result"><div class="result-wrap"><div class="result-head">Lucky Draw Result</div><div class="result-card"><img class="result-image" id="resultImage" src="asset/prize-5.png" alt="Prize"><div class="result-number" id="resultNumber">5th</div><div class="result-name" id="resultName"></div><p class="result-desc" id="resultDesc">You won a prize! Please follow the staff instructions to collect it.</p></div><div class="btnrow" style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap"><button class="btn primary" onclick="location.href='voice-pay.html'">About Voice Pay</button><button class="btn primary" onclick="location.href='voice-pay.html'">Start over Voice Pay</button><button class="btn primary" onclick="playLuckyDrawAgain()">Play Lucky Draw Again</button></div></div></section>
+</div><nav class="floatdash"><a href="lucky-draw-dashboard.html" id="toLuckyDash">Lucky Draw Dashboard</a><a href="voice-pay-dashboard.html" id="toVoiceDash">Voice Pay Dashboard</a></nav>
+<div class="winner-overlay" id="winnerOverlay"><div class="winner-card"><img id="popupImage" src="asset/prize-5.png" alt="Prize"><div class="w-number" id="popupNumber">5th</div><div class="w-name" id="popupName"></div></div></div>
+<div class="fireworks" id="fireworks"></div>
+<script>
+const KEY='asiapayLuckyDrawConfigV2';
+const defaultConfig={mode:'TEST',prizes:[
+{id:'p1',number:'1st',name:'',weight:1,stock:1,dailyLimit:1,used:0,enabled:true,image:'asset/prize-1.png',showImage:true},
+{id:'p2',number:'2nd',name:'',weight:3,stock:5,dailyLimit:null,used:0,enabled:true,image:'asset/prize-2.png',showImage:true},
+{id:'p3',number:'3rd',name:'',weight:6,stock:10,dailyLimit:null,used:0,enabled:true,image:'asset/prize-3.png',showImage:true},
+{id:'p4',number:'4th',name:'',weight:15,stock:30,dailyLimit:null,used:0,enabled:true,image:'asset/prize-4.png',showImage:true},
+{id:'p5',number:'5th',name:'',weight:30,stock:100,dailyLimit:null,used:0,enabled:true,image:'asset/prize-5.png',showImage:true},
+{id:'np',number:'6th',name:'',weight:45,stock:null,dailyLimit:null,used:0,enabled:true,image:'asset/noprize.png',showImage:true}],history:[]};
+function clone(o){return JSON.parse(JSON.stringify(o))}function cfg(){try{return JSON.parse(localStorage.getItem(KEY))||clone(defaultConfig)}catch(e){return clone(defaultConfig)}}function save(c){localStorage.setItem(KEY,JSON.stringify(c))}if(!localStorage.getItem(KEY))save(defaultConfig);
+function show(id){document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));document.getElementById(id).classList.add('active')}
+function getAvailable(c){return c.prizes.filter(p=>p.enabled&&(p.stock===null||p.stock>p.used)&&(!p.dailyLimit||p.used<p.dailyLimit)&&p.weight>0)}
+function weightedWinner(items){let total=items.reduce((a,p)=>a+p.weight,0),r=Math.random()*total;for(const p of items){r-=p.weight;if(r<=0)return p}return items[items.length-1]}
+function safeName(p){return p.name&&p.name.trim()?p.name.trim():(p.id==='np'?(lang==='TC'?'沒有獎品':'No Prize'):'')}
+function buildWheel(items){const wheel=document.getElementById('wheel');wheel.innerHTML='';const n=items.length;if(!n){wheel.style.background='#ddd';return[]}const seg=360/n;const colors=['#087bd9','#20bde9','#1456b8','#54c9ee','#0b3f8f','#339ee6'];const parts=[];const stops=[];items.forEach((p,i)=>{const start=i*seg,end=(i+1)*seg;parts.push(`${colors[i%colors.length]} ${start}deg ${end}deg`);const theta=(i+.5)*seg*Math.PI/180;const radius=n<=4?34:n===5?36:37;const x=50+radius*Math.sin(theta),y=50-radius*Math.cos(theta);const item=document.createElement('div');item.className='wheel-item'+(p.showImage===false?' noimg':'');item.style.left=x+'%';item.style.top=y+'%';const nm=safeName(p);item.innerHTML=`${p.showImage===false?'':`<img src="${p.image||'asset/noprize.png'}" alt="">`}<div class="wnum">${p.number}</div>${nm?`<div class="wname">${escapeHtml(nm)}</div>`:''}`;wheel.appendChild(item);stops.push({id:p.id,center:(i+.5)*seg})});wheel.style.background=`conic-gradient(from 0deg,${parts.join(',')})`;return stops}
+function escapeHtml(v){return String(v).replace(/[&<>'"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[m]))}
+function spinToWinner(items,winner){const stops=buildWheel(items);const stop=stops.find(s=>s.id===winner.id)||stops[0];const wheel=document.getElementById('wheel');wheel.classList.remove('spinning');wheel.style.transition='none';wheel.style.transform='rotate(0deg)';document.querySelectorAll('.wheel-item').forEach(el=>el.style.setProperty('--counter-target','0deg'));void wheel.offsetWidth;const extraTurns=8;const target=extraTurns*360+(360-stop.center);document.querySelectorAll('.wheel-item').forEach(el=>el.style.setProperty('--counter-target',(-target)+'deg'));wheel.classList.add('spinning');wheel.style.transition='transform 8.5s cubic-bezier(.07,.74,.13,1)';wheel.style.transform=`rotate(${target}deg)`;return 9000}
+function startDraw(){const c=cfg();const available=getAvailable(c);if(!available.length){alert('No prize is currently available.');return}show('drawing');const winner=weightedWinner(available);const delay=spinToWinner(available,winner);setTimeout(()=>{setTimeout(()=>showWinnerPopup(c,winner),3000)},delay)}
+function showWinnerPopup(c,winner){const overlay=document.getElementById('winnerOverlay');overlay.classList.remove('rarity-1','rarity-2','rarity-3');if(winner.id==='p1')overlay.classList.add('rarity-1');else if(winner.id==='p2')overlay.classList.add('rarity-2');else if(winner.id==='p3')overlay.classList.add('rarity-3');const img=document.getElementById('popupImage');const nm=safeName(winner);img.src=winner.image||'asset/noprize.png';img.classList.toggle('hide',winner.showImage===false);document.getElementById('popupNumber').textContent=winner.number;const name=document.getElementById('popupName');name.textContent=nm;name.classList.toggle('empty',!nm);overlay.classList.add('show');setTimeout(()=>{overlay.classList.remove('show','rarity-1','rarity-2','rarity-3');finishDraw(c,winner)},4000)}
+
+function prizeRank(p){
+ if(p.number) return p.number;
+ return ({p1:'1st',p2:'2nd',p3:'3rd',p4:'4th',p5:'5th',np:'6th'})[p.id] || p.name || '';
+}
+function prizeImagePath(p){
+ if(p.image) return p.image;
+ return ({p1:'asset/prize-1.png',p2:'asset/prize-2.png',p3:'asset/prize-3.png',p4:'asset/prize-4.png',p5:'asset/prize-5.png',np:'asset/noprize.png'})[p.id] || '';
+}
+function showPrizeReveal(c,winner){
+ const overlay=document.getElementById('revealOverlay');
+ const img=document.getElementById('revealImage');
+ const rank=prizeRank(winner);
+ overlay.className='reveal-overlay show';
+ if(winner.id==='p1') overlay.classList.add('tier-1');
+ else if(winner.id==='p2') overlay.classList.add('tier-2');
+ else if(winner.id==='p3') overlay.classList.add('tier-3');
+ else if(winner.id==='p4') overlay.classList.add('tier-4');
+ else if(winner.id==='p5') overlay.classList.add('tier-5');
+ else overlay.classList.add('no-prize');
+ document.getElementById('revealRank').textContent=rank;
+ document.getElementById('revealName').textContent=winner.name || (winner.id==='np'?'No Prize':'');
+ document.getElementById('revealIcon').textContent=winner.id==='np'?'💫':'⭐';
+ const imagePath=prizeImagePath(winner);
+ img.src=imagePath;
+ img.style.display=(winner.showImage===false || !imagePath)?'none':'block';
+ const particleRoot=document.getElementById('revealParticles');
+ particleRoot.innerHTML='';
+ const count=winner.id==='p1'?36:winner.id==='p2'?28:winner.id==='p3'?20:winner.id==='np'?6:12;
+ const symbols=winner.id==='np'?['✦','·','✧']:['★','✦','✧','✺'];
+ for(let i=0;i<count;i++){
+   const el=document.createElement('span');el.className='reveal-particle';el.textContent=symbols[i%symbols.length];
+   const angle=(Math.PI*2*i/count)+(Math.random()-.5)*.25;
+   const distance=120+Math.random()*260;
+   el.style.setProperty('--dx',`${Math.cos(angle)*distance}px`);
+   el.style.setProperty('--dy',`${Math.sin(angle)*distance}px`);
+   el.style.setProperty('--rot',`${Math.random()*240-120}deg`);
+   el.style.animationDelay=`${Math.random()*.18}s`;
+   particleRoot.appendChild(el);
+ }
+ // Hold the gacha-style reveal briefly, then continue to the existing Result page.
+ setTimeout(()=>{overlay.classList.remove('show');particleRoot.innerHTML='';finishDraw(c,winner);},2800);
+}
+
+function finishDraw(c,winner){if(c.mode==='LIVE'&&winner.stock!==null)winner.used++;const id='LD'+Date.now();c.history=c.history||[];c.history.push({drawId:id,time:new Date().toISOString(),result:safeName(winner)||winner.number,resultId:winner.id,mode:c.mode});if(c.history.length>500)c.history.shift();save(c);document.getElementById('resultNumber').textContent=winner.number;const nm=document.getElementById('resultName');nm.textContent=safeName(winner);nm.classList.toggle('empty',!safeName(winner));const im=document.getElementById('resultImage');im.src=winner.image||'asset/noprize.png';im.classList.toggle('hide',winner.showImage===false);document.getElementById('resultDesc').textContent=winner.id==='np'?I18N[lang].resultDescNone:I18N[lang].resultDescWin;show('result');if(['p1','p2','p3'].includes(winner.id))launchFireworks(winner.id==='p1'?3:winner.id==='p2'?2:1)}
+function launchFireworks(level){const box=document.getElementById('fireworks');box.innerHTML='';box.classList.add('show');const colors=['#ffdf57','#ff4d6d','#45d9ff','#7cff7c','#b77cff','#ffffff'];const bursts=level===3?6:level===2?4:2;const perBurst=level===3?28:level===2?24:20;for(let b=0;b<bursts;b++){const cx=14+Math.random()*72,cy=12+Math.random()*48;for(let i=0;i<perBurst;i++){const p=document.createElement('i');p.className='particle';const a=Math.random()*Math.PI*2,d=90+Math.random()*260;p.style.setProperty('--x',cx+'%');p.style.setProperty('--y',cy+'%');p.style.setProperty('--dx',Math.cos(a)*d+'px');p.style.setProperty('--dy',(Math.sin(a)*d+70)+'px');p.style.setProperty('--c',colors[(i+b)%colors.length]);p.style.setProperty('--dur',(1.15+Math.random()*1.5)+'s');box.appendChild(p)}}const confetti=level===3?70:level===2?48:28;for(let i=0;i<confetti;i++){const p=document.createElement('i');p.className='particle';p.style.width=(7+Math.random()*7)+'px';p.style.height=(12+Math.random()*10)+'px';p.style.borderRadius='2px';p.style.setProperty('--x',Math.random()*100+'%');p.style.setProperty('--y','-3%');p.style.setProperty('--dx',(Math.random()*260-130)+'px');p.style.setProperty('--dy',(650+Math.random()*650)+'px');p.style.setProperty('--c',colors[i%colors.length]);p.style.setProperty('--dur',(2+Math.random()*1.8)+'s');box.appendChild(p)}}
+function playLuckyDrawAgain(){history.replaceState(null,'',location.pathname);const f=document.getElementById('fireworks');f.classList.remove('show');f.innerHTML='';const w=document.getElementById('wheel');w.classList.remove('spinning');w.style.transition='none';w.style.transform='rotate(0deg)';show('intro')}
+function resetGame(){const w=document.getElementById('wheel');w.classList.remove('spinning');w.style.transition='none';w.style.transform='rotate(0deg)';show('intro')}
+const I18N={
+EN:{
+ langBtn:'TC',dashboard:'Dashboard',eyebrow:'HK FinTech Week 2026',title:'LUCKY DRAW!',sub:'Try your luck and see what prize you win.',good:'Good Luck!',drawing:'Drawing...',spinNote:'Watch the wheel slow down and stop on your prize!',resultHead:'Lucky Draw Result',aboutVoice:'About Voice Pay',startVoice:'Start over Voice Pay',playLucky:'Play Lucky Draw Again',resultDescWin:'You won a prize! Please follow the staff instructions to collect it.',resultDescNone:'No prize this time. Thank you for playing!',playAgain:'Play Again',noPrize:'No Prize'
+},
+TC:{
+ langBtn:'EN',dashboard:'控制面板',eyebrow:'香港金融科技周 2026',title:'幸運抽獎！',sub:'試試你的運氣，看看你會贏得什麼獎品。',good:'祝你好運！',drawing:'抽獎中⋯',spinNote:'請留意轉盤，轉盤會慢慢減速並停在您的獎品上！',resultHead:'抽獎結果',aboutVoice:'關於 Voice Pay',startVoice:'重新開始 Voice Pay',playLucky:'再次玩幸運抽獎',resultDescWin:'恭喜您贏得獎品！請按照工作人員的指示領取獎品。',resultDescNone:'今次沒有獎品，謝謝參與！',playAgain:'再玩一次',noPrize:'沒有獎品'
+}
+};
+function applyLanguage(){const t=I18N[lang];document.getElementById('langBtn').textContent=t.langBtn;document.getElementById('toLuckyDash').textContent=lang==='TC'?'幸運抽獎控制台':'Lucky Draw Dashboard';document.getElementById('toVoiceDash').textContent=lang==='TC'?'Voice Pay 控制台':'Voice Pay Dashboard';document.querySelector('#intro .eyebrow').textContent=t.eyebrow;document.querySelector('#intro .title').textContent=t.title;document.querySelector('#intro .sub').textContent=t.sub;document.querySelector('#drawing .eyebrow').textContent=t.good;document.querySelector('#drawing .title').textContent=t.drawing;document.querySelector('#drawing .spin-note').textContent=t.spinNote;document.querySelector('#result .result-head').textContent=t.resultHead;const resultBtns=document.querySelectorAll('#result .btn');if(resultBtns[0])resultBtns[0].textContent=t.aboutVoice;if(resultBtns[1])resultBtns[1].textContent=t.startVoice;if(resultBtns[2])resultBtns[2].textContent=t.playLucky;const c=cfg();const name=document.getElementById('resultName');if(name.textContent==='' || name.textContent==='No Prize' || name.textContent==='沒有獎品'){}const desc=document.getElementById('resultDesc');if(document.getElementById('resultNumber').textContent==='6th'){desc.textContent=t.resultDescNone}else{desc.textContent=t.resultDescWin}if(document.getElementById('popupName').textContent==='No Prize' || document.getElementById('popupName').textContent==='沒有獎品'){document.getElementById('popupName').textContent=t.noPrize}}
+let lang=localStorage.getItem('asiapayLuckyDrawLang')||'EN';
+applyLanguage();
+document.getElementById('langBtn').onclick=()=>{lang=lang==='EN'?'TC':'EN';localStorage.setItem('asiapayLuckyDrawLang',lang);applyLanguage()};
+</script>
+</body></html>
